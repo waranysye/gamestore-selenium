@@ -66,7 +66,7 @@ class Profile extends BaseController
            VALIDATION
         =============================== */
         $rules = [
-            'email'    => "required|valid_email|is_unique[users.email,id,{$userId}]",
+            'email' => "required|valid_email|is_unique[users.email,id,{$userId}]",
             'password' => 'permit_empty|min_length[6]'
         ];
 
@@ -109,8 +109,13 @@ class Profile extends BaseController
             $data['photo'] = $newName;
         }
 
-        $this->userModel->update($userId, $data);
-
-        return redirect()->to('/')->with('success', 'Profile updated successfully');
+        $db = \Config\Database::connect();
+        $db->table('users')
+           ->where('id', $userId)
+           ->update($data);
+           
+        session()->set('email', $data['email']);
+        // Redirect balik ke profile, jangan ke '/' (Home)
+        return redirect()->to('/profile')->with('success', 'Profile updated successfully');
     }
 }

@@ -49,6 +49,6 @@ class CreatePaymentTransactions extends Migration
 
 public function down()
 {
-    $this->forge->dropTable('payment_transactions');
+    $this->forge->dropTable('payment_transactions', true);
 }
 }

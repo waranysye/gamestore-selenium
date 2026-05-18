@@ -39,17 +39,17 @@ class Checkout extends BaseController
     {
         $userId = session()->get('user_id');
 
-        // ===== BUY NOW MODE =====
         $buyNowGameId = session()->get('buy_now_item');
 
+        // BUY NOW
         if ($buyNowGameId) {
 
-            // Cegah beli ulang
-            if ($this->userGame
+            $owned = $this->userGame
                 ->where('user_id', $userId)
                 ->where('game_id', $buyNowGameId)
-                ->first()) {
+                ->first();
 
+            if ($owned) {
                 session()->remove('buy_now_item');
                 return redirect()->to('/library');
             }
@@ -67,16 +67,14 @@ class Checkout extends BaseController
                 'price'       => $game['price']
             ]];
 
-            $total = $game['price'];
-
             return view('User/checkout', [
                 'items' => $items,
-                'total' => $total,
+                'total' => $game['price'],
                 'mode'  => 'buy_now'
             ]);
         }
 
-        // ===== CART MODE =====
+        // CART
         $cart = $this->cart->where('user_id', $userId)->first();
 
         if (!$cart) {
@@ -102,30 +100,8 @@ class Checkout extends BaseController
         ]);
     }
 
-    public function cancel($orderId)
-{
-    $order = $this->order->find($orderId);
-
-    if (!$order) {
-        return redirect()->to('/');
-    }
-
-    // Update order jadi cancelled
-    $this->order->update($orderId, [
-        'status' => 'cancelled'
-    ]);
-
-    // Update payment jadi failed
-    $this->payment
-        ->where('order_id', $orderId)
-        ->set(['status' => 'failed'])
-        ->update();
-
-    return redirect()->to('/payment/status/' . $orderId);
-}
-
     // ==========================
-    // BUY NOW (SET SESSION)
+    // BUY NOW
     // ==========================
     public function buyNow()
     {
@@ -141,138 +117,155 @@ class Checkout extends BaseController
     }
 
     // ==========================
-    // CONFIRM PAYMENT
+    // CANCEL ORDER
     // ==========================
-    public function confirm()
-{
-    $userId        = session()->get('user_id');
-    $paymentMethod = $this->request->getPost('payment_method');
+    public function cancel($orderId)
+    {
+        $order = $this->order->find($orderId);
 
-    $buyNowGameId = session()->get('buy_now_item');
-
-    // =====================
-    // BUY NOW MODE
-    // =====================
-    if ($buyNowGameId) {
-
-        $game = $this->game->find($buyNowGameId);
-
-        if (!$game) {
+        if (!$order) {
             return redirect()->to('/');
         }
 
-        if ($this->userGame
-            ->where('user_id', $userId)
-            ->where('game_id', $buyNowGameId)
-            ->first()) {
+        $this->order->update($orderId, [
+            'status' => 'cancelled'
+        ]);
+
+        $this->payment
+            ->where('order_id', $orderId)
+            ->set(['status' => 'failed'])
+            ->update();
+
+        return redirect()->to('/payment/status/' . $orderId);
+    }
+
+    // ==========================
+    // CONFIRM PAYMENT
+    // ==========================
+    public function confirm()
+    {
+        $userId        = session()->get('user_id');
+        $paymentMethod = $this->request->getPost('payment_method');
+
+        if (!$paymentMethod) {
+            return redirect()->back();
+        }
+
+        $buyNowGameId = session()->get('buy_now_item');
+
+        // =====================
+        // BUY NOW MODE
+        // =====================
+        if ($buyNowGameId) {
+
+            $game = $this->game->find($buyNowGameId);
+
+            if (!$game) {
+                return redirect()->to('/');
+            }
+
+            $items = [[
+                'game_id' => $game['id'],
+                'price'   => $game['price']
+            ]];
+
+            $total = $game['price'];
 
             session()->remove('buy_now_item');
-            return redirect()->to('/library');
+
+        } else {
+
+            // =====================
+            // CART MODE
+            // =====================
+            $cart = $this->cart->where('user_id', $userId)->first();
+
+            if (!$cart) {
+                return redirect()->to('/cart');
+            }
+
+            $items = $this->cartItem
+                ->where('cart_id', $cart['id'])
+                ->findAll();
+
+            if (!$items) {
+                return redirect()->to('/cart');
+            }
+
+            $total = array_sum(array_column($items, 'price'));
         }
 
-        $items = [[
-            'game_id' => $game['id'],
-            'price'   => $game['price']
-        ]];
-
-        $total = $game['price'];
-
-        session()->remove('buy_now_item');
-    }
-    else {
         // =====================
-        // CART MODE
+        // CREATE ORDER (PENDING)
         // =====================
-        $cart = $this->cart->where('user_id', $userId)->first();
-
-        if (!$cart) {
-            return redirect()->to('/cart');
-        }
-
-        $items = $this->cartItem
-            ->where('cart_id', $cart['id'])
-            ->findAll();
-
-        if (!$items) {
-            return redirect()->to('/cart');
-        }
-
-        $total = array_sum(array_column($items, 'price'));
-    }
-
-    // =====================
-    // CREATE ORDER (PENDING)
-    // =====================
-    $orderId = $this->order->insert([
-        'user_id'     => $userId,
-        'total_price' => $total,
-        'status'      => 'pending'
-    ]);
-
-    // =====================
-    // SAVE ORDER DETAIL ONLY
-    // (JANGAN masukkan ke user_games dulu)
-    // =====================
-    foreach ($items as $item) {
-        $this->orderDetail->insert([
-            'order_id' => $orderId,
-            'game_id'  => $item['game_id'],
-            'price'    => $item['price']
+        $orderId = $this->order->insert([
+            'user_id'     => $userId,
+            'total_price' => $total,
+            'status'      => 'pending'
         ]);
+
+        // =====================
+        // SAVE ORDER DETAILS
+        // =====================
+        foreach ($items as $item) {
+            $this->orderDetail->insert([
+                'order_id' => $orderId,
+                'game_id'  => $item['game_id'],
+                'price'    => $item['price']
+            ]);
+        }
+
+        // =====================
+        // PAYMENT PENDING
+        // =====================
+        $this->payment->insert([
+            'order_id'       => $orderId,
+            'payment_method' => $paymentMethod,
+            'transaction_id' => 'TXN-' . time(),
+            'gross_amount'   => $total,
+            'status'         => 'pending',
+            'paid_at'        => null
+        ]);
+
+        // =====================
+        // CLEAR CART
+        // =====================
+        if (isset($cart)) {
+            $this->cartItem->where('cart_id', $cart['id'])->delete();
+        }
+
+        return redirect()->to('/payment/status/' . $orderId);
     }
 
-    // =====================
-    // PAYMENT RECORD (PENDING)
-    // =====================
-    $this->payment->insert([
-        'order_id'       => $orderId,
-        'payment_method' => $paymentMethod,
-        'transaction_id' => 'TXN-' . time(),
-        'gross_amount'   => $total,
-        'status'         => 'pending',
-        'paid_at'        => null
-    ]);
-
-    // Clear cart jika cart mode
-    if (!isset($buyNowGameId) && isset($cart)) {
-        $this->cartItem->where('cart_id', $cart['id'])->delete();
-    }
-
-    return redirect()->to('/payment/status/' . $orderId);
-}
     // ==========================
     // PAYMENT STATUS
     // ==========================
     public function status($orderId)
-{
-    $order = $this->order->find($orderId);
+    {
+        $order = $this->order->find($orderId);
 
-    if (!$order) {
-        return redirect()->to('/');
+        if (!$order) {
+            return redirect()->to('/');
+        }
+
+        $payment = $this->payment
+            ->where('order_id', $orderId)
+            ->first();
+
+        if (!$payment) {
+            return redirect()->to('/');
+        }
+
+        $items = $this->orderDetail
+            ->select('order_details.*, games.title')
+            ->join('games', 'games.id = order_details.game_id')
+            ->where('order_id', $orderId)
+            ->findAll();
+
+        return view('User/paymentstatus', [
+            'order'   => $order,
+            'payment' => $payment,
+            'items'   => $items
+        ]);
     }
-
-    $payment = $this->payment
-        ->where('order_id', $orderId)
-        ->first();
-
-    if (!$payment) {
-        return redirect()->to('/');
-    }
-
-    // 🔥 Ambil items dari order_details + join games
-    $items = $this->orderDetail
-        ->select('order_details.*, games.title')
-        ->join('games', 'games.id = order_details.game_id')
-        ->where('order_id', $orderId)
-        ->findAll();
-
-    $vaNumber = '880608' . str_pad($orderId, 6, '0', STR_PAD_LEFT);
-
-    return view('User/paymentstatus', [
-        'order'     => $order,
-        'payment'   => $payment,
-        'items'     => $items,   // 🔥 ini yang kurang tadi
-        'va_number' => $vaNumber
-    ]);
-}
 }

@@ -29,6 +29,6 @@ class CreateCarts extends Migration
 
 public function down()
 {
-    $this->forge->dropTable('carts');
+    $this->forge->dropTable('carts', true);
 }
 }

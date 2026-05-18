@@ -38,6 +38,6 @@ class CreateOrders extends Migration
 
 public function down()
 {
-    $this->forge->dropTable('orders');
+    $this->forge->dropTable('orders', true);
 }
 }

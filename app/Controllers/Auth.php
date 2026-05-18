@@ -53,7 +53,9 @@ class Auth extends Controller
         ->with('error', 'Invalid email or password.');
     }
 
-        $this->session->regenerate(true);
+        if (ENVIRONMENT !== 'testing') {
+    $this->session->regenerate(true);
+    }
 
         $this->session->set([
             'user_id'    => $user['id'],
@@ -88,9 +90,15 @@ class Auth extends Controller
         }
 
         $rules = [
-            'name'     => 'required|min_length[3]',
+            'name'     => 'required|alpha_space|min_length[3]|max_length[50]', // Ditambah alpha_space
             'email'    => 'required|valid_email|is_unique[users.email]',
             'password' => 'required|min_length[6]'
+        ];
+
+        $errors = [
+            'name' => [
+                'alpha_space' => 'Name can only contain letters and spaces (no numbers or symbols).',
+            ]
         ];
 
         if (!$this->validate($rules)) {

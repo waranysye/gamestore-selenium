@@ -1,61 +1,158 @@
-# CodeIgniter 4 Framework
+# 🎮 GameStore - Selenium Test Automation Project
 
-## What is CodeIgniter?
+A **Software Testing & Quality Assurance** project built with **CodeIgniter 4** and **Selenium WebDriver (PHP)** for automated UI testing of an online game store application.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+---
 
-This repository holds the distributable version of the framework.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+## 📌 Project Overview
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+This project contains automated test suites for the **GameStore** web application — an e-commerce platform for purchasing digital games. The testing framework uses **PHPUnit** with **Facebook WebDriver** to simulate real browser interactions via Selenium.
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+---
 
-## Important Change with index.php
+## 🧪 Test Coverage
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+| Module         | Test File                      | Test Cases |
+|----------------|-------------------------------|------------|
+| Login          | `tests/ui/LoginTest.php`       | 9 tests    |
+| Register       | `tests/ui/RegisterTest.php`    | 8 tests    |
+| Cart           | `tests/ui/CartTest.php`        | ~5 tests   |
+| Checkout       | `tests/ui/CheckoutTest.php`    | ~5 tests   |
+| Library        | `tests/ui/LibraryTest.php`     | ~5 tests   |
+| Profile        | `tests/ui/ProfileTest.php`     | ~4 tests   |
+| Admin CRUD     | `tests/ui/AdminCrudTest.php`   | ~6 tests   |
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+---
 
-**Please** read the user guide for a better explanation of how CI4 works!
+## 🛠️ Tech Stack
 
-## Repository Management
+- **Backend Framework:** CodeIgniter 4 (PHP 8.2+)
+- **Testing Framework:** PHPUnit 10.5
+- **Browser Automation:** Facebook PHP WebDriver (Selenium)
+- **Database:** MySQL (via XAMPP)
+- **Browser:** Google Chrome + ChromeDriver
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+---
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+## ⚙️ Requirements
 
-## Contributing
+- PHP >= 8.2
+- XAMPP (Apache + MySQL)
+- Composer
+- Google Chrome browser
+- ChromeDriver (matching your Chrome version)
+- Selenium Server / ChromeDriver running on `localhost:9515`
 
-We welcome contributions from the community.
+---
 
-Please read the [*Contributing to CodeIgniter*](https://github.com/codeigniter4/CodeIgniter4/blob/develop/CONTRIBUTING.md) section in the development repository.
+## 🚀 Setup & Installation
 
-## Server Requirements
+### 1. Clone the Repository
+```bash
+git clone https://github.com/nazlakhayra-23/gamestore.git
+cd gamestore
+```
 
-PHP version 8.2 or higher is required, with the following extensions installed:
+### 2. Install Dependencies
+```bash
+composer install
+```
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+### 3. Configure Environment
+```bash
+cp .env.example .env
+```
+Edit `.env` and set your database credentials:
+```
+database.default.hostname = 127.0.0.1
+database.default.database = partdua_gamestore
+database.default.username = root
+database.default.password = 
+```
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - The end of life date for PHP 8.1 was December 31, 2025.
-> - If you are still using below PHP 8.2, you should upgrade immediately.
-> - The end of life date for PHP 8.2 will be December 31, 2026.
+### 4. Run Database Migration & Seeder
+```bash
+php spark migrate
+php spark db:seed UserSeeder
+php spark db:seed CategorySeeder
+php spark db:seed GamesSeeder
+php spark db:seed AdminSeeder
+```
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+### 5. Start the Application
+```bash
+php spark serve --port=8082
+```
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+### 6. Start ChromeDriver
+Run ChromeDriver from the `driver/` folder:
+```bash
+./chromedriver --port=9515
+```
+
+---
+
+## ▶️ Running Tests
+
+### Run All Tests
+```bash
+vendor/bin/phpunit
+```
+
+### Run Specific Test File
+```bash
+vendor/bin/phpunit tests/ui/LoginTest.php
+vendor/bin/phpunit tests/ui/RegisterTest.php
+```
+
+### Run with Verbose Output
+```bash
+vendor/bin/phpunit --testdox
+```
+
+---
+
+## 📁 Project Structure
+
+```
+gamestoreSelenium/
+├── app/
+│   ├── Controllers/        # Application controllers
+│   ├── Models/             # Database models
+│   ├── Views/              # HTML views
+│   └── Database/
+│       ├── Migrations/     # Database schema
+│       └── Seeds/          # Test data seeders
+├── tests/
+│   ├── ui/                 # Selenium UI tests
+│   ├── unit/               # Unit tests
+│   ├── Support/            # Base test classes & helpers
+│   └── report/             # Test screenshots (auto-generated)
+├── public/                 # Web-accessible folder
+├── phpunit.xml             # PHPUnit configuration
+└── composer.json           # PHP dependencies
+```
+
+---
+
+## 👥 Test Accounts
+
+| Role  | Email                   | Password   |
+|-------|-------------------------|------------|
+| User  | dash@gmail.com          | dash123    |
+| Admin | admin@gamestore.com     | admin123   |
+
+---
+
+## 📝 Notes
+
+- Test screenshots on failure are saved to `tests/report/screenshots/`
+- Make sure ChromeDriver version matches your installed Chrome version
+- The app must be running at `http://localhost:8082` before executing tests
+- Test database: `partdua_gamestore` (configured in `phpunit.xml`)
+
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.

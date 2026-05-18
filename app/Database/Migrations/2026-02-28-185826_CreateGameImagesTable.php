@@ -45,7 +45,7 @@ class CreateGameImagesTable extends Migration
     }
 
     public function down()
-    {
-        $this->forge->dropTable('game_images');
-    }
+{
+    $this->forge->dropTable('game_images', true);
+}
 }

@@ -9,22 +9,28 @@ class CreateCategories extends Migration
     public function up()
 {
     $this->forge->addField([
-        'id' => [
-            'type' => 'INT',
-            'unsigned' => true,
-            'auto_increment' => true,
-        ],
-        'name' => [
-            'type' => 'VARCHAR',
-            'constraint' => 100,
-        ],
-        'slug' => [
-            'type' => 'VARCHAR',
-            'constraint' => 150,
-        ],
-        'created_at DATETIME default current_timestamp',
-        'updated_at DATETIME default current_timestamp on update current_timestamp'
-    ]);
+    'id' => [
+        'type' => 'INT',
+        'unsigned' => true,
+        'auto_increment' => true,
+    ],
+    'name' => [
+        'type' => 'VARCHAR',
+        'constraint' => 100,
+    ],
+    'slug' => [
+        'type' => 'VARCHAR',
+        'constraint' => 150,
+    ],
+    'created_at' => [
+        'type' => 'DATETIME',
+        'null' => true,
+    ],
+    'updated_at' => [
+        'type' => 'DATETIME',
+        'null' => true,
+    ],
+]);
 
     $this->forge->addKey('id', true);
     $this->forge->createTable('categories');
@@ -32,6 +38,6 @@ class CreateCategories extends Migration
 
 public function down()
 {
-    $this->forge->dropTable('categories');
+    $this->forge->dropTable('categories', true);
 }
 }

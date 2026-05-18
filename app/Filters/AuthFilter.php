@@ -8,15 +8,24 @@ use CodeIgniter\Filters\FilterInterface;
 
 class AuthFilter implements FilterInterface
 {
-    public function before(RequestInterface $request, $arguments = null)
-    {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/login');
-        }
+    // app/Filters/AuthFilter.php
+
+public function before(RequestInterface $request, $arguments = null)
+{
+    // Jika sedang testing, kita bisa melonggarkan filter atau pastikan session terbaca
+    if (ENVIRONMENT === 'testing') {
+        // Opsional: Logika tambahan jika diperlukan
     }
+
+    if (!session()->get('user_id')) {
+        return redirect()->to('/login');
+    }
+
+    return null;
+}
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        // nothing
+        // tidak dipakai
     }
 }

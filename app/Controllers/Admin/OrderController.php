@@ -44,71 +44,86 @@ class OrderController extends BaseController
     }
 
     // =============================
-    // APPROVE ORDER (FINALIZE)
+    // APPROVE ORDER
     // =============================
     public function approve($id)
 {
     $order = $this->orderModel->find($id);
 
-    if (!$order || $order['status'] !== 'pending') {
-        return redirect()->back();
+    if (!$order || $order['status'] != 'pending') {
+        return redirect()->to('/admin/orders');
     }
 
     $this->db->transStart();
 
-    // Update order
+    // update orders
     $this->orderModel->update($id, [
         'status' => 'paid'
     ]);
 
-    // Update payment
+    // update payment
     $this->paymentModel
         ->where('order_id', $id)
         ->set([
-            'status'  => 'success',
+            'status' => 'success',
             'paid_at' => date('Y-m-d H:i:s')
         ])
         ->update();
 
-    // Ambil semua game dari order_details
+    // ambil detail order
     $items = $this->orderDetailModel
         ->where('order_id', $id)
         ->findAll();
 
     foreach ($items as $item) {
-        $this->userGameModel->insert([
-            'user_id'     => $order['user_id'],
-            'game_id'     => $item['game_id'],
-            'acquired_at' => date('Y-m-d H:i:s')
-        ]);
+
+        $exists = $this->userGameModel
+            ->where('user_id', $order['user_id'])
+            ->where('game_id', $item['game_id'])
+            ->first();
+
+        if (!$exists) {
+
+            $this->userGameModel->insert([
+                'user_id'         => $order['user_id'],
+                'game_id'         => $item['game_id'],
+                'order_detail_id' => $item['id'], // FIX UTAMA
+                'acquired_at'     => date('Y-m-d H:i:s')
+            ]);
+        }
     }
 
     $this->db->transComplete();
 
-    return redirect()->back()->with('success', 'Order approved & game added to library.');
+    return redirect()->to('/admin/orders')
+        ->with('success', 'Order approved successfully.');
 }
+
     // =============================
     // REJECT ORDER
     // =============================
     public function reject($id)
-{
-    $order = $this->orderModel->find($id);
+    {
+        $order = $this->orderModel->find($id);
 
-    if (!$order || $order['status'] !== 'pending') {
-        return redirect()->back();
+        if (!$order || $order['status'] !== 'pending') {
+            return redirect()->to('/admin/orders');
+        }
+
+        // Update order
+        $this->orderModel->update($id, [
+            'status' => 'cancelled'
+        ]);
+
+        // Update payment
+        $this->paymentModel
+            ->where('order_id', $id)
+            ->set([
+                'status' => 'failed'
+            ])
+            ->update();
+
+        return redirect()->to('/admin/orders')
+            ->with('success', 'Order rejected successfully.');
     }
-
-    // Update order
-    $this->orderModel->update($id, [
-        'status' => 'cancelled'
-    ]);
-
-    // Update payment
-    $this->paymentModel
-        ->where('order_id', $id)
-        ->set(['status' => 'failed'])
-        ->update();
-
-    return redirect()->back()->with('success', 'Order rejected.');
-}
 }

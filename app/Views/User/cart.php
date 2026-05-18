@@ -218,10 +218,10 @@ h1 {
             </span>
         </div>
 
-        <<?php $isEmpty = empty($cartItems); ?>
+        <?php $isEmpty = empty($cartItems); ?>
 
-<form action="<?= base_url('checkout') ?>" method="post">
-    <button class="checkout-btn" <?= $isEmpty ? 'disabled' : '' ?>>
+<form action="<?= base_url('checkout') ?>" method="get">
+    <button type="submit" class="checkout-btn" <?= $isEmpty ? 'disabled' : '' ?>>
         Proceed to Checkout
     </button>
 </form>

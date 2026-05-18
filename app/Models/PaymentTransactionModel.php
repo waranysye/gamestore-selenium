@@ -18,7 +18,7 @@ class PaymentTransactionModel extends Model
         'transaction_id',
         'gross_amount',
         'status',
-        'paid_at',
+        'paid_at',        
     ];
 
     protected bool $allowEmptyInserts = false;

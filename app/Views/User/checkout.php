@@ -1,3 +1,15 @@
+
+<?php
+/**
+ * @var string $mode
+ * @var array<int, array{
+ *   game_id:int|string,
+ *   title:string,
+ *   price:int|float
+ * }> $items
+ * @var int|float $total
+ */
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,10 +63,6 @@ body {
 .nav a {
     color: var(--text-dim);
     text-decoration: none;
-}
-
-.nav a.active {
-    color: var(--accent);
 }
 
 .search input {
@@ -166,8 +174,8 @@ body {
     <div class="logo">Game Store</div>
 
     <div class="nav">
-        <a href="<?= base_url('/'); ?>">Store</a>
-        <a href="<?= base_url('library'); ?>">Library</a>
+        <a href="<?= base_url('/') ?>">Store</a>
+        <a href="<?= base_url('library') ?>">Library</a>
     </div>
 
     <div class="search">
@@ -175,7 +183,7 @@ body {
     </div>
 
     <div class="icons">
-        <a href="<?= base_url('cart'); ?>"><i class="fa-solid fa-cart-shopping"></i></a>
+        <a href="<?= base_url('cart') ?>"><i class="fa-solid fa-cart-shopping"></i></a>
         <a href="#"><i class="fa-solid fa-receipt"></i></a>
         <a href="#"><i class="fa-solid fa-user"></i></a>
     </div>
@@ -183,10 +191,19 @@ body {
 
 <!-- BREADCRUMB -->
 <div class="breadcrumb">
-    Store › <a href="<?= base_url('cart'); ?>" style="color:#a0a0b8">Shopping Cart</a> › <b>Checkout</b>
+    Store › <a href="<?= base_url('cart') ?>" style="color:#a0a0b8">Shopping Cart</a> › <b>Checkout</b>
 </div>
 
-a<form action="<?= base_url('checkout/confirm'); ?>" method="post">
+<form action="<?= base_url('checkout/confirm') ?>" method="post">
+<?= csrf_field() ?>
+
+<input type="hidden" name="mode" value="<?= esc($mode) ?>">
+
+<?php if ($mode === 'buy_now' && !empty($items[0]['game_id'])): ?>
+    <input type="hidden" name="game_id" value="<?= esc($items[0]['game_id']) ?>">
+<?php endif; ?>
+
+<input type="hidden" name="payment_method" id="payment_method" value="bank_transfer">
 
 <div class="container">
 
@@ -194,20 +211,22 @@ a<form action="<?= base_url('checkout/confirm'); ?>" method="post">
     <div class="card">
         <h3>Select Payment Method</h3>
 
-        <input type="hidden" name="payment_method" id="payment_method">
-
         <div class="payment-methods">
             <div class="method active" onclick="selectPayment(this,'bank_transfer')">
                 <i class="fa-solid fa-building-columns"></i>
                 <div>Bank Transfer</div>
             </div>
+
             <div class="method" onclick="selectPayment(this,'e_wallet')">
                 <i class="fa-solid fa-wallet"></i>
                 <div>E-Wallet</div>
             </div>
         </div>
 
-        
+        <div id="bankBox">
+            <label>Bank Account</label>
+            <input class="input" type="text" value="BCA / BNI / Mandiri" readonly>
+        </div>
 
         <div id="walletBox" style="display:none">
             <label>Phone Number</label>
@@ -216,10 +235,10 @@ a<form action="<?= base_url('checkout/confirm'); ?>" method="post">
 
         <h4 style="margin-top:30px">Order Items</h4>
 
-        <?php foreach($items as $item): ?>
+        <?php foreach ($items as $item): ?>
         <div class="item">
-            <span><?= esc($item['title']); ?></span>
-            <span>Rp <?= number_format($item['price'],0,',','.'); ?></span>
+            <span><?= esc($item['title'] ?? '-') ?></span>
+            <span>Rp <?= number_format((float)($item['price'] ?? 0), 0, ',', '.') ?></span>
         </div>
         <?php endforeach; ?>
     </div>
@@ -230,10 +249,10 @@ a<form action="<?= base_url('checkout/confirm'); ?>" method="post">
 
         <div class="item">
             <span>Total</span>
-            <strong>Rp <?= number_format($total,0,',','.'); ?></strong>
+            <strong>Rp <?= number_format((float)$total, 0, ',', '.') ?></strong>
         </div>
 
-        <button class="btn">
+        <button type="submit" class="btn">
             <i class="fa-solid fa-lock"></i> Confirm Payment
         </button>
     </div>
@@ -243,16 +262,21 @@ a<form action="<?= base_url('checkout/confirm'); ?>" method="post">
 
 <script>
 function selectPayment(el, method) {
-    document.querySelectorAll('.method').forEach(m => m.classList.remove('active'));
+    document.querySelectorAll('.method').forEach(m => {
+        m.classList.remove('active');
+    });
+
     el.classList.add('active');
 
     document.getElementById('payment_method').value = method;
 
-    document.getElementById('bankBox').style.display = method === 'bank_transfer' ? 'block' : 'none';
-    document.getElementById('walletBox').style.display = method === 'e_wallet' ? 'block' : 'none';
+    document.getElementById('bankBox').style.display =
+        method === 'bank_transfer' ? 'block' : 'none';
+
+    document.getElementById('walletBox').style.display =
+        method === 'e_wallet' ? 'block' : 'none';
 }
 
-// default
 document.getElementById('payment_method').value = 'bank_transfer';
 </script>
 

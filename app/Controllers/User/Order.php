@@ -21,20 +21,20 @@ class Order extends BaseController
      * LIST TRANSACTIONS
      */
     public function index()
-{
-    $userId = session()->get('user_id');
+    {
+        $userId = session()->get('user_id');
 
-    $orders = $this->orderModel
-        ->where('user_id', $userId)
-        ->orderBy('created_at', 'DESC')
-        ->paginate(5);
+        $orders = $this->orderModel
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'DESC')
+            ->paginate(5);
 
-    return view('User/transaction', [
-        'orders'     => $orders,
-        'pager'      => $this->orderModel->pager,
-        'activePage' => 'orders' // ✅ FIX
-    ]);
-}
+        return view('User/transaction', [
+            'orders'     => $orders,
+            'pager'      => $this->orderModel->pager,
+            'activePage' => 'orders'
+        ]);
+    }
 
     /**
      * ORDER DETAIL
@@ -49,7 +49,7 @@ class Order extends BaseController
             ->first();
 
         if (!$order) {
-            return redirect()->to('/transactions');
+            return redirect()->to('/orders');
         }
 
         $items = $this->orderDetailModel
@@ -58,9 +58,10 @@ class Order extends BaseController
             ->where('order_id', $orderId)
             ->findAll();
 
-        return view('User/transactions/detail', [
+        return view('User/transaction', [
             'order' => $order,
-            'items' => $items
+            'items' => $items,
+            'mode'  => 'detail' // optional biar view bisa bedain list vs detail
         ]);
     }
 }

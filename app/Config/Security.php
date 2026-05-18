@@ -6,81 +6,25 @@ use CodeIgniter\Config\BaseConfig;
 
 class Security extends BaseConfig
 {
-    /**
-     * --------------------------------------------------------------------------
-     * CSRF Protection Method
-     * --------------------------------------------------------------------------
-     *
-     * Protection Method for Cross Site Request Forgery protection.
-     *
-     * @var string 'cookie' or 'session'
-     */
-    public string $csrfProtection = 'cookie';
+    // Gunakan session untuk keamanan lebih baik
+    public string $csrfProtection = 'session'; 
 
-    /**
-     * --------------------------------------------------------------------------
-     * CSRF Token Randomization
-     * --------------------------------------------------------------------------
-     *
-     * Randomize the CSRF Token for added security.
-     */
-    public bool $tokenRandomize = false;
+    // Aktifkan untuk mencegah eksploitasi token statis
+    public bool $tokenRandomize = true;
 
-    /**
-     * --------------------------------------------------------------------------
-     * CSRF Token Name
-     * --------------------------------------------------------------------------
-     *
-     * Token name for Cross Site Request Forgery protection.
-     */
-    public string $tokenName = 'csrf_test_name';
-
-    /**
-     * --------------------------------------------------------------------------
-     * CSRF Header Name
-     * --------------------------------------------------------------------------
-     *
-     * Header name for Cross Site Request Forgery protection.
-     */
+    // Nama token yang muncul di input hidden (bebas diubah)
+    public string $tokenName = 'csrf_gamestore_token';
+    
     public string $headerName = 'X-CSRF-TOKEN';
 
-    /**
-     * --------------------------------------------------------------------------
-     * CSRF Cookie Name
-     * --------------------------------------------------------------------------
-     *
-     * Cookie name for Cross Site Request Forgery protection.
-     */
     public string $cookieName = 'csrf_cookie_name';
 
-    /**
-     * --------------------------------------------------------------------------
-     * CSRF Expires
-     * --------------------------------------------------------------------------
-     *
-     * Expiration time for Cross Site Request Forgery protection cookie.
-     *
-     * Defaults to two hours (in seconds).
-     */
     public int $expires = 7200;
 
-    /**
-     * --------------------------------------------------------------------------
-     * CSRF Regenerate
-     * --------------------------------------------------------------------------
-     *
-     * Regenerate CSRF Token on every submission.
-     */
+    // Biarkan true agar setiap submit form menghasilkan token baru
     public bool $regenerate = true;
 
-    /**
-     * --------------------------------------------------------------------------
-     * CSRF Redirect
-     * --------------------------------------------------------------------------
-     *
-     * Redirect to previous page with error on failure.
-     *
-     * @see https://codeigniter4.github.io/userguide/libraries/security.html#redirection-on-failure
-     */
+    // Biarkan false di development/testing agar muncul error 403 yang jelas
     public bool $redirect = (ENVIRONMENT === 'production');
 }
+

@@ -53,7 +53,7 @@ class GameModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-     /**
+    /**
      * TRENDING GAMES (LIMIT 4)
      */
     public function getTrendingGames(int $limit = 4): array
@@ -65,10 +65,10 @@ class GameModel extends Model
                 games.cover_image,
                 categories.name AS category_name
             ')
-            ->join('categories', 'categories.id = games.category_id')
+            ->join('categories', 'categories.id = games.category_id', 'left')
             ->orderBy('games.created_at', 'DESC')
             ->limit($limit)
-            ->find();
+            ->findAll(); // FIX
     }
 
     /**
@@ -83,10 +83,10 @@ class GameModel extends Model
                 games.cover_image,
                 categories.name AS category_name
             ')
-            ->join('categories', 'categories.id = games.category_id')
+            ->join('categories', 'categories.id = games.category_id', 'left')
             ->orderBy('games.created_at', 'DESC')
             ->limit($limit)
-            ->find();
+            ->findAll(); // FIX
     }
 
     /**
@@ -98,7 +98,7 @@ class GameModel extends Model
                 games.*,
                 categories.name AS category_name
             ')
-            ->join('categories', 'categories.id = games.category_id')
+            ->join('categories', 'categories.id = games.category_id', 'left')
             ->where('games.id', $id)
             ->first();
     }
@@ -115,7 +115,7 @@ class GameModel extends Model
                 games.cover_image,
                 categories.name AS category_name
             ')
-            ->join('categories', 'categories.id = games.category_id')
+            ->join('categories', 'categories.id = games.category_id', 'left')
             ->like('games.title', $keyword)
             ->orderBy('games.created_at', 'DESC')
             ->findAll();

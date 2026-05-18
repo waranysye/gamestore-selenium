@@ -37,6 +37,9 @@ class Filters extends BaseFilters
 
     'auth'  => \App\Filters\AuthFilter::class,
     'admin' => \App\Filters\AdminFilter::class,
+
+    'authApi'  => \App\Filters\AuthApi::class,
+    'adminApi' => \App\Filters\AdminApi::class,
 ];
 
     /**
@@ -76,14 +79,16 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
-            // 'csrf',
+            // 'csrf',  <-- Pastikan ini dikomentari seperti ini
             // 'invalidchars',
         ],
         'after' => [
+            'toolbar',
             // 'honeypot',
             // 'secureheaders',
         ],
     ];
+    
 
     /**
      * List of filter aliases that works on a

@@ -91,6 +91,15 @@ class Session extends BaseConfig
      * will be later deleted by the garbage collector.
      */
     public bool $regenerateDestroy = false;
+    /**
+     * --------------------------------------------------------------------------
+     * Session Regenerate
+     * --------------------------------------------------------------------------
+     *
+     * Whether to regenerate the session ID on every page load.
+     * Set to FALSE to prevent "Session ID cannot be regenerated" error in Selenium.
+     */
+    public bool $regenerate = false;
 
     /**
      * --------------------------------------------------------------------------

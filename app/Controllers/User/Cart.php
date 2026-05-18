@@ -24,29 +24,27 @@ class Cart extends BaseController
      * CART PAGE
      */
     public function index()
-{
-    $userId = session()->get('user_id');
+    {
+        $userId = session()->get('user_id');
 
-    if (!$userId) {
-        return redirect()->to('/login');
-    }
+        if (!$userId) {
+            return redirect()->to(base_url('login'));
+        }
 
-    // Ambil cart user
-    $cart = $this->cartModel->getUserCart($userId);
+        $cart = $this->cartModel->getUserCart($userId);
 
-    if (!$cart) {
+        if (!$cart) {
+            return view('User/cart', [
+                'cartItems' => []
+            ]);
+        }
+
+        $cartItems = $this->cartItemModel->getCartItems($cart['id']);
+
         return view('User/cart', [
-            'cartItems' => []
+            'cartItems' => $cartItems
         ]);
     }
-
-    // Ambil item dari CartItemModel (pakai function yang sudah ada)
-    $cartItems = $this->cartItemModel->getCartItems($cart['id']);
-
-    return view('User/cart', [
-        'cartItems' => $cartItems
-    ]);
-}
 
     /**
      * ADD GAME TO CART
@@ -55,14 +53,17 @@ class Cart extends BaseController
     {
         $userId = session()->get('user_id');
 
-        // Ambil game
+        if (!$userId) {
+            return redirect()->to(base_url('login'));
+        }
+
         $game = $this->gameModel->find($gameId);
 
         if (!$game) {
-            return redirect()->back()->with('error', 'Game not found.');
+            return redirect()->to(base_url('cart'))
+                ->with('error', 'Game not found');
         }
 
-        // Ambil / buat cart
         $cart = $this->cartModel->getUserCart($userId);
 
         if (!$cart) {
@@ -73,29 +74,44 @@ class Cart extends BaseController
             $cartId = $cart['id'];
         }
 
-        // Cegah game dobel
-        if ($this->cartItemModel->isGameInCart($cartId, $gameId)) {
-            return redirect()->back()
-                ->with('error', 'Game already in cart.');
+        // 🔥 FIX: cegah duplicate item
+        $exists = $this->cartItemModel->isGameInCart($cartId, $gameId);
+
+        if (!$exists) {
+            $this->cartItemModel->insert([
+                'cart_id' => $cartId,
+                'game_id' => $gameId,
+                'price'   => $game['price'],
+            ]);
         }
 
-        // Insert cart item
-        $this->cartItemModel->insert([
-            'cart_id' => $cartId,
-            'game_id' => $gameId,
-            'price'   => $game['price'], // snapshot harga
-        ]);
-
-        return redirect()->to('/cart')
-            ->with('success', 'Game added to cart.');
+        // ✅ SELALU REDIRECT KE CART (STABIL UNTUK SELENIUM)
+        return redirect()->to(base_url('cart'));
     }
 
     /**
      * REMOVE ITEM
      */
     public function remove($id)
-    {
-        $this->cartItemModel->delete($id);
-        return redirect()->to('/cart');
+{
+    $userId = session()->get('user_id');
+    if (!$userId) {
+        return redirect()->to(base_url('login'));
     }
+
+    $cart = $this->cartModel->getUserCart($userId);
+    
+    // Cari item berdasarkan ID primary key-nya
+    $item = $this->cartItemModel->where([
+        'id'      => $id, 
+        'cart_id' => $cart['id']
+    ])->first();
+
+    if ($item) {
+        // Gunakan $item['id'] untuk memastikan kita menghapus baris yang benar
+        $this->cartItemModel->delete($item['id']);
+    }
+
+    return redirect()->to(base_url('cart'));
+}
 }

@@ -80,6 +80,7 @@ tests/coverage*
 
 # Don't save phpunit under version control.
 phpunit
+.phpunit.result.cache
 
 #-------------------------
 # Composer
@@ -124,3 +125,22 @@ _modules/*
 
 /results/
 /phpunit*.xml
+
+#-------------------------
+# Project Specific
+#-------------------------
+
+# ChromeDriver & Chrome binary (OS-specific)
+chrome/
+driver/
+php
+
+# Test reports & screenshots (auto-generated)
+tests/report/
+tests/coverage*
+
+# PHPUnit coverage output
+public/coverage/
+
+# Selenium temp
+test_selenium.php

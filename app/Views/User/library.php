@@ -66,6 +66,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
 }
 
 .btn-play {
@@ -82,7 +83,8 @@
     padding: 10px 18px;
     border-radius: 10px;
     color: #fff;
-    text-decoration: none;
+    border: none;
+    cursor: pointer;
     font-size: 14px;
 }
 </style>
@@ -101,7 +103,8 @@
             <div class="game-card">
 
                 <img src="<?= base_url('uploads/games/'.$game['cover_image']) ?>"
-     alt="<?= esc($game['title']) ?>">
+                     alt="<?= esc($game['title']) ?>">
+
                 <div class="game-content">
                     <h3><?= esc($game['title']) ?></h3>
 
@@ -110,13 +113,32 @@
                     </div>
 
                     <div class="game-action">
-                        <?php if ($game['installed'] ?? false): ?>
+
+                        <?php if ($game['installed']): ?>
+
+                            <!-- PLAY -->
                             <a href="#" class="btn-play">Play</a>
+
+                            <!-- UNINSTALL -->
+                            <form class="action-form" action="<?= base_url('library/uninstall/'.$game['id']) ?>" method="post">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="btn-download" style="background:#ef4444;">
+                                    Uninstall
+                                </button>
+                            </form>
+
                         <?php else: ?>
-                            <a href="<?= base_url('download/game/'.$game['id']) ?>" class="btn-download">
-                                Download
-                            </a>
+
+                            <!-- DOWNLOAD -->
+                            <form class="action-form" action="<?= base_url('library/download/'.$game['id']) ?>" method="post">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="btn-download">
+                                    Download
+                                </button>
+                            </form>
+
                         <?php endif; ?>
+
                     </div>
                 </div>
 
@@ -125,5 +147,19 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.action-form').forEach(form => {
+        form.addEventListener('submit', function() {
+            const btn = this.querySelector('button');
+            if (btn) {
+                btn.innerText = 'Processing...';
+                btn.disabled = true;
+            }
+        });
+    });
+});
+</script>
 
 <?= $this->endSection() ?>

@@ -27,7 +27,7 @@ class Paths
      * the path if the folder is not in the same directory as this file.
      */
     public string $systemDirectory = __DIR__ . '/../../system';
-
+    
     /**
      * ---------------------------------------------------------------
      * APPLICATION FOLDER NAME
@@ -41,8 +41,7 @@ class Paths
      * @see http://codeigniter.com/user_guide/general/managing_apps.html
      */
     public string $appDirectory = __DIR__ . '/..';
-
-    /**
+    /** 
      * ---------------------------------------------------------------
      * WRITABLE DIRECTORY NAME
      * ---------------------------------------------------------------
@@ -54,7 +53,7 @@ class Paths
      * system directories.
      */
     public string $writableDirectory = __DIR__ . '/../../writable';
-
+    
     /**
      * ---------------------------------------------------------------
      * TESTS DIRECTORY NAME
@@ -63,6 +62,7 @@ class Paths
      * This variable must contain the name of your "tests" directory.
      */
     public string $testsDirectory = __DIR__ . '/../../tests';
+    public string $supportDirectory = __DIR__ . '/../../tests/_support';
 
     /**
      * ---------------------------------------------------------------
