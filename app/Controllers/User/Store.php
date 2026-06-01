@@ -3,18 +3,21 @@
 namespace App\Controllers\User;
 
 use App\Controllers\BaseController;
+use App\Models\GameImageModel;
 use App\Models\GameModel;
-use App\Models\CartModel;
 use App\Models\CartItemModel;
+use App\Models\CartModel;
 use App\Models\UserGameModel;
 
 class Store extends BaseController
 {
     protected GameModel $gameModel;
+    protected GameImageModel $gameImageModel;
 
     public function __construct()
     {
         $this->gameModel = new GameModel();
+        $this->gameImageModel = new GameImageModel();
     }
 
     /**
@@ -44,11 +47,7 @@ class Store extends BaseController
      */
     public function detail($id)
     {
-        $game = $this->gameModel
-            ->select('games.*, categories.name as category_name')
-            ->join('categories', 'categories.id = games.category_id')
-            ->where('games.id', $id)
-            ->first();
+        $game = $this->gameModel->getGameDetail($id);
 
         if (!$game) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
@@ -67,7 +66,6 @@ class Store extends BaseController
             $cartItemModel = new CartItemModel();
             $userGameModel = new UserGameModel();
 
-            // 🔥 FIX: pakai cart_items, bukan cart
             $cart = $cartModel->getUserCart($userId);
 
             if ($cart) {
@@ -77,7 +75,6 @@ class Store extends BaseController
                     ->first() ? true : false;
             }
 
-            // ownership check
             $owned = $userGameModel->userOwnsGame($userId, $id);
 
             if ($owned) {
@@ -90,13 +87,17 @@ class Store extends BaseController
             }
         }
 
+        $images = $this->gameImageModel->getImagesByGame($id);
+        $relatedGames = $this->gameModel->getRelatedGames($id);
+
         return view('User/detail', [
-            'game'       => $game,
-            'images'     => [],
-            'inCart'     => $inCart,
-            'owned'      => $owned,
-            'downloaded' => $downloaded,
-            'isLoggedIn' => $isLoggedIn
+            'game'         => $game,
+            'images'       => $images,
+            'relatedGames' => $relatedGames,
+            'inCart'       => $inCart,
+            'owned'        => $owned,
+            'downloaded'   => $downloaded,
+            'isLoggedIn'   => $isLoggedIn
         ]);
     }
 

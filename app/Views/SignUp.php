@@ -33,22 +33,7 @@
         color: var(--text-main);
     }
 
-    /* HEADER */
-    header {
-        display: flex;
-        align-items: center;
-        padding: 22px 60px;
-        border-bottom: 1px solid var(--border-soft);
-    }
 
-    .logo {
-        font-weight: 600;
-        font-size: 18px;
-    }
-
-    .logo span {
-        color: var(--accent);
-    }
 
     /* LAYOUT */
     .container {
@@ -254,12 +239,8 @@
 </style>
 </head>
 <body>
-
-<header>
-    <div class="logo">
-        ⭐ <span>Game Store</span>
-    </div>
-</header>
+<!-- GLOBAL HEADBAR -->
+<?= view('partials/headbar') ?>
 
 <div class="container">
 
@@ -268,7 +249,7 @@
         <div class="left-content">
             <div class="logo-box">
                 <!-- GANTI LOGO -->
-                <img src="<?= base_url('uploads/Logo/logo.png'); ?>" 
+                <img src="<?= base_url('uploads/Logo/Logo.png'); ?>" 
      alt="Logo"
      style="max-width:80%; max-height:80%; object-fit:contain;">
             </div>

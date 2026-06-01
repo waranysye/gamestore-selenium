@@ -66,8 +66,7 @@ class Library extends BaseController
             ->set(['installed' => 1])
             ->update();
 
-        return redirect()->to('/library')
-            ->with('success', 'Game berhasil di-download');
+        return redirect()->to('/download/game/' . $gameId);
     }
 
     /**

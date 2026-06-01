@@ -50,8 +50,8 @@ class Download extends BaseController
                 ->with('error', 'Game file not found.');
         }
 
-        // 4️⃣ Lokasi file (WAJIB di WRITEPATH)
-        $filePath = WRITEPATH . 'uploads/games/' . $game['game_file'];
+        // 4️⃣ Lokasi file
+        $filePath = ROOTPATH . 'public/uploads/games/' . $game['game_file'];
 
         if (!file_exists($filePath)) {
             return redirect()

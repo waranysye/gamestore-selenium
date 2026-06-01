@@ -89,6 +89,7 @@ $routes->group('admin', ['filter' => 'admin', 'namespace' => 'App\Controllers\Ad
     $routes->get('games/edit/(:num)', 'GameController::edit/$1');
     $routes->post('games/update/(:num)', 'GameController::update/$1');
     $routes->post('games/delete/(:num)', 'GameController::delete/$1');
+    $routes->post('games/remove-image/(:num)', 'GameController::removeImage/$1');
 
     // ORDERS
     $routes->get('orders', 'OrderController::index');

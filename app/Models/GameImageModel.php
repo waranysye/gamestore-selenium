@@ -14,7 +14,7 @@ class GameImageModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'game_id',
-        'image_path',
+        'image',
         'created_at',
         'updated_at',
     ];
@@ -26,7 +26,7 @@ class GameImageModel extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -34,8 +34,8 @@ class GameImageModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'game_id'    => 'required|is_natural_no_zero',
-        'image_path' => 'required|max_length[255]',
+        'game_id' => 'required|is_natural_no_zero',
+        'image'   => 'required|max_length[255]',
     ];
     protected $validationMessages   = [];
     protected $skipValidation       = false;
@@ -54,8 +54,14 @@ class GameImageModel extends Model
 
     public function getImagesByGame(int $gameId): array
     {
-        return $this->where('game_id', $gameId)
+        return $this->select('id, game_id, image')
+                    ->where('game_id', $gameId)
                     ->orderBy('id', 'ASC')
                     ->findAll();
+    }
+
+    public function deleteImagesByGame(int $gameId): bool
+    {
+        return $this->where('game_id', $gameId)->delete();
     }
 }

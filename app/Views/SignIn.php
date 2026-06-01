@@ -33,25 +33,7 @@
         color: var(--text-main);
     }
 
-    header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 22px 60px;
-        border-bottom: 1px solid var(--border-soft);
-    }
 
-    .logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-weight: 600;
-        font-size: 18px;
-    }
-
-    .logo span {
-        color: var(--accent);
-    }
 
     .container {
         display: flex;
@@ -213,11 +195,8 @@
 </head>
 <body>
 
-<header>
-    <div class="logo">
-        ⭐ <span>Game Store</span>
-    </div>
-</header>
+<!-- GLOBAL HEADBAR -->
+<?= view('partials/headbar') ?>
 
 <div class="container">
 

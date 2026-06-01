@@ -116,8 +116,10 @@
 
                         <?php if ($game['installed']): ?>
 
-                            <!-- PLAY -->
-                            <a href="#" class="btn-play">Play</a>
+                            <!-- DOWNLOAD -->
+                            <a href="<?= base_url('download/game/'.$game['id']) ?>" class="btn-download">
+                                Download Game
+                            </a>
 
                             <!-- UNINSTALL -->
                             <form class="action-form" action="<?= base_url('library/uninstall/'.$game['id']) ?>" method="post">
@@ -129,11 +131,11 @@
 
                         <?php else: ?>
 
-                            <!-- DOWNLOAD -->
+                            <!-- INSTALL / DOWNLOAD -->
                             <form class="action-form" action="<?= base_url('library/download/'.$game['id']) ?>" method="post">
                                 <?= csrf_field() ?>
                                 <button type="submit" class="btn-download">
-                                    Download
+                                    Install & Download
                                 </button>
                             </form>
 

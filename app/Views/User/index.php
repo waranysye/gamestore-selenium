@@ -104,6 +104,7 @@ body { background:var(--main-bg); color:var(--text-main); }
     overflow:hidden;
     transition:0.2s ease;
     cursor:pointer;
+    position:relative;
 }
 
 .card:hover {
@@ -115,6 +116,20 @@ body { background:var(--main-bg); color:var(--text-main); }
     width:100%;
     height:150px;
     object-fit:cover;
+}
+
+.card .badge {
+    position:absolute;
+    top:14px;
+    left:14px;
+    background:var(--accent);
+    color:white;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
 }
 
 .card .info { padding:14px; }
@@ -144,26 +159,8 @@ body { background:var(--main-bg); color:var(--text-main); }
 
 <body>
 
-<div class="header">
-    <div class="logo">Game Store</div>
-
-    <div class="nav">
-        <a href="<?= base_url('/') ?>" class="active">Store</a>
-        <a href="<?= base_url('library') ?>">Library</a>
-    </div>
-
-    <div class="icons">
-        <a href="<?= base_url('cart') ?>">
-            <i class="fa-solid fa-cart-shopping"></i>
-        </a>
-        <a href="<?= base_url('transactions') ?>">
-            <i class="fa-solid fa-receipt"></i>
-        </a>
-        <a href="<?= base_url('profile') ?>">
-            <i class="fa-solid fa-user"></i>
-        </a>
-    </div>
-</div>
+<!-- GLOBAL HEADBAR -->
+<?= view('partials/headbar') ?>
 
 <!-- HERO -->
 <div class="hero">
@@ -198,8 +195,12 @@ body { background:var(--main-bg); color:var(--text-main); }
     <?php else: ?>
     <div class="grid">
         <?php foreach ($games as $game): ?>
+            <?php $isNew = !empty($game['created_at']) && strtotime($game['created_at']) > strtotime('-30 days'); ?>
             <a href="<?= base_url('game/'.$game['id']); ?>" class="card-link">
                 <div class="card">
+                    <?php if ($isNew): ?>
+                        <div class="badge">New</div>
+                    <?php endif; ?>
                     <img src="<?= base_url('uploads/games/' . $game['cover_image']) ?>">
                     <div class="info">
                         <div class="title"><?= esc($game['title']); ?></div>

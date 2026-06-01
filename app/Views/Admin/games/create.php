@@ -45,6 +45,17 @@
 
 <h2>Add Game</h2>
 
+<?php if (!empty(session()->getFlashdata('errors'))): ?>
+    <div class="alert alert-danger" style="margin-bottom:20px;padding:15px;border-radius:12px;background:#ffe3e3;color:#9f1c1c;">
+        <strong>Validation failed:</strong>
+        <ul style="margin-top:10px;list-style:disc;padding-left:20px;">
+            <?php foreach (session()->getFlashdata('errors') as $error): ?>
+                <li><?= esc($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
+
 <form action="<?= site_url('admin/games') ?>" method="post" enctype="multipart/form-data">
     <?= csrf_field() ?>
 
@@ -52,28 +63,35 @@
         <tr>
             <td><label for="title">Title</label></td>
             <td>
-                <input type="text" name="title" id="title" required class="form-control">
+                <input type="text" name="title" id="title" value="<?= esc(old('title')) ?>" required class="form-control">
             </td>
         </tr>
 
         <tr>
             <td><label for="description">Description</label></td>
             <td>
-                <textarea name="description" id="description" required class="form-control"></textarea>
+                <textarea name="description" id="description" required class="form-control"><?= esc(old('description')) ?></textarea>
             </td>
         </tr>
 
         <tr>
             <td><label for="price">Price</label></td>
             <td>
-                <input type="number" name="price" id="price" required class="form-control" min="0" step="0.01">
+                <input type="number" name="price" id="price" value="<?= esc(old('price')) ?>" required class="form-control" min="0" step="0.01">
             </td>
         </tr>
 
         <tr>
             <td><label for="game_file">Game File</label></td>
             <td>
-                <input type="text" name="game_file" id="game_file" class="form-control">
+                <input type="text" name="game_file" id="game_file" value="<?= esc(old('game_file')) ?>" class="form-control">
+            </td>
+        </tr>
+        <tr>
+            <td><label for="size">File Size (MB)</label></td>
+            <td>
+                <input type="number" name="size" id="size" value="<?= esc(old('size')) ?>" class="form-control" min="0" step="1" placeholder="Contoh: 350">
+                <small style="color:#aaa;">Masukkan ukuran game dalam MB untuk detail spesifikasi.</small>
             </td>
         </tr>
 
@@ -108,8 +126,11 @@
             <td>
                 <select name="category_id" id="category_id" required class="form-control">
                     <option value="">-- Select Category --</option>
-                    <option value="1">The Cozy Dreamer</option>
-                    <option value="2">The Urban Legend</option>
+                    <?php foreach ($categories as $c): ?>
+                        <option value="<?= esc($c['id']) ?>" <?= set_value('category_id') == $c['id'] ? 'selected' : '' ?> >
+                            <?= esc($c['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
             </td>
         </tr>

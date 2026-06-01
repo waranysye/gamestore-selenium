@@ -19,6 +19,7 @@ class GameModel extends Model
         'cover_image',
         'game_file',
         'category_id',
+        'size',
         'created_at',
         'updated_at',
     ];
@@ -101,6 +102,25 @@ class GameModel extends Model
             ->join('categories', 'categories.id = games.category_id', 'left')
             ->where('games.id', $id)
             ->first();
+    }
+
+    /**
+     * GET RELATED GAMES
+     */
+    public function getRelatedGames(int $gameId, int $limit = 4): array
+    {
+        $game = $this->find($gameId);
+
+        if (!$game) {
+            return [];
+        }
+
+        return $this->select('id, title, price, cover_image')
+                    ->where('category_id', $game['category_id'])
+                    ->where('id !=', $gameId)
+                    ->orderBy('created_at', 'DESC')
+                    ->limit($limit)
+                    ->findAll();
     }
 
     /**

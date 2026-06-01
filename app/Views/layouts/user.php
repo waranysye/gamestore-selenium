@@ -25,54 +25,15 @@ $activePage = $activePage ?? '';
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
 body{background:var(--main-bg);color:var(--text-main);}
 
-/* HEADER USER */
-.header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:16px 32px;
-    background:var(--sidebar-bg);
-}
-.logo{font-size:20px;font-weight:700;}
-.nav{display:flex;gap:24px;}
-.nav a{
-    color:var(--text-dim);
-    text-decoration:none;
-    font-weight:500;
-}
-.nav a.active{color:var(--accent);}
-.icons{
-    display:flex;
-    gap:18px;
-}
-.icons a{
-    color:white;
-    font-size:18px;
-}
+
 </style>
 </head>
 <script src="https://cdn.tailwindcss.com"></script>
 
 <body>
 
-<!-- HEADER USER -->
-<div class="header">
-    <div class="logo">Game Store</div>
-
-    <div class="nav">
-        <a href="<?= base_url('/') ?>"
-           class="<?= ($activePage==='store')?'active':'' ?>">Store</a>
-
-        <a href="<?= base_url('library') ?>"
-           class="<?= ($activePage==='library')?'active':'' ?>">Library</a>
-    </div>
-
-    <div class="icons">
-        <a href="<?= base_url('cart') ?>"><i class="fa-solid fa-cart-shopping"></i></a>
-        <a href="<?= base_url('transactions') ?>"><i class="fa-solid fa-receipt"></i></a>
-        <a href="<?= base_url('profile') ?>"><i class="fa-solid fa-user"></i></a>
-    </div>
-</div>
+<!-- GLOBAL HEADBAR -->
+<?= view('partials/headbar') ?>
 
 <?= $this->renderSection('content') ?>
 

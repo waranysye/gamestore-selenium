@@ -170,24 +170,8 @@ body {
 <body>
 
 <!-- HEADER -->
-<div class="header">
-    <div class="logo">Game Store</div>
-
-    <div class="nav">
-        <a href="<?= base_url('/') ?>">Store</a>
-        <a href="<?= base_url('library') ?>">Library</a>
-    </div>
-
-    <div class="search">
-        <input type="text" placeholder="Search games...">
-    </div>
-
-    <div class="icons">
-        <a href="<?= base_url('cart') ?>"><i class="fa-solid fa-cart-shopping"></i></a>
-        <a href="#"><i class="fa-solid fa-receipt"></i></a>
-        <a href="#"><i class="fa-solid fa-user"></i></a>
-    </div>
-</div>
+<!-- GLOBAL HEADBAR -->
+<?= view('partials/headbar') ?>
 
 <!-- BREADCRUMB -->
 <div class="breadcrumb">

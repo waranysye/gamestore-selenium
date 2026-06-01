@@ -2,49 +2,51 @@
 namespace App\Controllers\User;
 
 use App\Controllers\BaseController;
-use App\Models\GameModel;
+use App\Models\CartItemModel;
 use App\Models\CartModel;
+use App\Models\GameImageModel;
+use App\Models\GameModel;
 use App\Models\UserGameModel;
 
 class Game extends BaseController
 {
     protected GameModel $gameModel;
+    protected GameImageModel $gameImageModel;
 
     public function __construct()
     {
         $this->gameModel = new GameModel();
+        $this->gameImageModel = new GameImageModel();
     }
 
     public function detail($id)
     {
-        $game = $this->gameModel
-            ->select('games.*, categories.name as category_name')
-            ->join('categories', 'categories.id = games.category_id')
-            ->where('games.id', $id)
-            ->first();
+        $game = $this->gameModel->getGameDetail($id);
 
         if (!$game) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
         $userId = session()->get('user_id');
+        $isLoggedIn = !empty($userId);
 
-        // default guest state
         $inCart = false;
         $owned = false;
         $downloaded = false;
 
-        // hanya hitung kalau login
-        if ($userId) {
-
+        if ($isLoggedIn) {
             $cartModel = new CartModel();
-
-            $inCart = $cartModel
-                ->where('user_id', $userId)
-                ->where('game_id', $id)
-                ->first() ? true : false;
-
+            $cartItemModel = new CartItemModel();
             $userGameModel = new UserGameModel();
+
+            $cart = $cartModel->getUserCart($userId);
+
+            if ($cart) {
+                $inCart = $cartItemModel
+                    ->where('cart_id', $cart['id'])
+                    ->where('game_id', $id)
+                    ->first() ? true : false;
+            }
 
             $owned = $userGameModel->userOwnsGame($userId, $id);
 
@@ -58,13 +60,16 @@ class Game extends BaseController
             }
         }
 
+        $images = $this->gameImageModel->getImagesByGame($id);
+
         return view('User/detail', [
-            'game'       => $game,
-            'images'     => [],
-            'inCart'     => $inCart,
-            'owned'      => $owned,
-            'downloaded' => $downloaded,
-            'isGuest'    => !$userId // 🔥 penting untuk UI control
+            'game'         => $game,
+            'images'       => $images,
+            'relatedGames' => [],
+            'inCart'       => $inCart,
+            'owned'        => $owned,
+            'downloaded'   => $downloaded,
+            'isLoggedIn'   => $isLoggedIn
         ]);
     }
 }
